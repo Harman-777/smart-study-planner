@@ -11,11 +11,12 @@
     <div>
       <p class="eyebrow">Minor Project</p>
       <h1>Smart Study Planner</h1>
-      <p class="summary">Plan subjects, track tasks, monitor study hours, and prepare smarter for exams.</p>
+      <p class="summary">AI-assisted study planning, task scoring, weekly scheduling, and progress analytics.</p>
     </div>
 
     <nav aria-label="Dashboard sections">
       <a href="#dashboard">Dashboard</a>
+      <a href="#ai-coach">AI Coach</a>
       <a href="#planner">Planner</a>
       <a href="#subjects">Subjects</a>
       <a href="#timer">Focus Timer</a>
@@ -25,9 +26,9 @@
   <main>
     <section id="dashboard" class="hero">
       <div>
-        <p class="eyebrow">Student Dashboard</p>
-        <h2>Today&apos;s Study Control Room</h2>
-        <p>Organize homework, exam preparation, and revision with simple analytics stored in your browser.</p>
+        <p class="eyebrow">AI Student Dashboard</p>
+        <h2>Study Smarter With an AI Coach</h2>
+        <p>Plan tasks, detect weak subjects, calculate urgency, and generate a practical 7-day study strategy.</p>
       </div>
       <div class="date-card">
         <span id="todayLabel">Today</span>
@@ -53,6 +54,42 @@
         <span>High Priority</span>
         <strong id="urgentCount">0</strong>
       </article>
+    </section>
+
+    <section id="ai-coach" class="ai-panel">
+      <div class="section-heading with-actions">
+        <div>
+          <p class="eyebrow">AI Coach</p>
+          <h2>Personal Study Intelligence</h2>
+        </div>
+        <button id="generatePlan" class="secondary-button" type="button">Generate Plan</button>
+      </div>
+
+      <div class="coach-grid">
+        <article class="coach-card">
+          <span>Risk Level</span>
+          <strong id="riskLevel">Low</strong>
+          <p id="riskReason">Your current study load looks balanced.</p>
+        </article>
+        <article class="coach-card">
+          <span>Next Best Task</span>
+          <strong id="nextTask">No pending task</strong>
+          <p id="nextTaskReason">Add tasks to receive a smart recommendation.</p>
+        </article>
+        <article class="coach-card">
+          <span>Weak Subject</span>
+          <strong id="weakSubject">None</strong>
+          <p id="weakReason">The system compares pending work and completed progress.</p>
+        </article>
+      </div>
+
+      <div class="plan-output">
+        <div>
+          <p class="eyebrow">Generated Weekly Plan</p>
+          <h3>Adaptive 7-Day Schedule</h3>
+        </div>
+        <div id="weeklyPlan" class="weekly-plan"></div>
+      </div>
     </section>
 
     <section id="planner" class="workspace">

@@ -2,11 +2,11 @@
 
 ## Project Name
 
-Smart Study Planner
+Smart Study Planner AI
 
 ## Problem Statement
 
-Many students forget deadlines, do not track how many hours they study, and cannot easily see which subjects need more attention. This project solves that by providing a simple study planning dashboard.
+Many students forget deadlines, do not track how many hours they study, and cannot easily see which subjects need more attention. This project solves that by providing an AI-assisted study planning dashboard.
 
 ## Main Modules
 
@@ -18,13 +18,19 @@ Many students forget deadlines, do not track how many hours they study, and cann
    - Shows pending tasks, completed tasks, total hours, and urgent tasks.
    - Calculates completion percentage.
 
-3. Subject Progress Chart
+3. AI Coach
+   - Scores tasks using priority, due date, and estimated hours.
+   - Recommends the next best task.
+   - Detects weak subjects.
+   - Generates a 7-day adaptive study plan.
+
+4. Subject Progress Chart
    - Shows total planned hours for each subject.
 
-4. Focus Timer
+5. Focus Timer
    - Provides a 25-minute study timer.
 
-5. Local Storage
+6. Local Storage
    - Saves tasks in the browser even after refreshing the page.
 
 ## Important JavaScript Concepts Used
@@ -36,10 +42,22 @@ Many students forget deadlines, do not track how many hours they study, and cann
 - Local storage
 - Timer using `setInterval`
 - Dynamic chart rendering
+- Rule-based AI recommendation system
+- Urgency scoring algorithm
 
 ## Why This Project Is Useful
 
-It helps students plan better, reduce missed deadlines, and understand their study progress subject by subject.
+It helps students plan better, reduce missed deadlines, understand weak subjects, and decide which task should be completed first.
+
+## How Is AI Used?
+
+The project uses a rule-based AI approach. It calculates an AI score for each task based on:
+
+- Priority
+- Due date
+- Estimated study hours
+
+The task with the highest score is recommended as the next best task. The app also checks subject-wise pending hours to detect weak areas.
 
 ## Possible Teacher Questions
 
@@ -53,8 +71,12 @@ The task status changes to completed, the dashboard updates, and the completion 
 
 ### Can this project be expanded?
 
-Yes. It can be expanded with login, cloud database, notifications, PDF export, and detailed reports.
+Yes. It can be expanded with login, cloud database, notifications, PDF export, detailed reports, and a real AI API for natural language guidance.
 
 ### Which part is dynamic?
 
 The task list, dashboard numbers, subject chart, filters, and timer are all controlled dynamically using JavaScript.
+
+### Is this real AI?
+
+It is an AI-inspired rule-based recommendation system. It does not use a paid API, but it follows AI decision-making ideas such as scoring, ranking, and personalized recommendations.

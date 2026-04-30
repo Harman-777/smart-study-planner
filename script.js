@@ -15,6 +15,14 @@ const todayLabel = document.querySelector("#todayLabel");
 const timerDisplay = document.querySelector("#timerDisplay");
 const startTimer = document.querySelector("#startTimer");
 const resetTimer = document.querySelector("#resetTimer");
+const generatePlan = document.querySelector("#generatePlan");
+const riskLevel = document.querySelector("#riskLevel");
+const riskReason = document.querySelector("#riskReason");
+const nextTask = document.querySelector("#nextTask");
+const nextTaskReason = document.querySelector("#nextTaskReason");
+const weakSubject = document.querySelector("#weakSubject");
+const weakReason = document.querySelector("#weakReason");
+const weeklyPlan = document.querySelector("#weeklyPlan");
 
 let tasks = loadTasks();
 let timerSeconds = 25 * 60;
@@ -92,6 +100,8 @@ function render() {
   renderTasks(visibleTasks);
   renderStats();
   renderChart();
+  renderCoach();
+  renderWeeklyPlan();
 }
 
 function renderTasks(visibleTasks) {
@@ -130,6 +140,7 @@ function renderTasks(visibleTasks) {
     meta.append(
       makeBadge(task.subject),
       makeBadge(task.priority, task.priority === "High" ? "high" : ""),
+      makeBadge("AI score " + calculateTaskScore(task), "score"),
       document.createTextNode(formatDate(task.dueDate) + " | " + task.hours + " hrs")
     );
 
@@ -147,6 +158,98 @@ function renderTasks(visibleTasks) {
     content.append(title, meta);
     item.append(checkbox, content, deleteButton);
     taskList.append(item);
+  });
+}
+
+function calculateTaskScore(task) {
+  if (task.done) return 0;
+
+  const today = new Date();
+  const dueDate = new Date(task.dueDate + "T00:00:00");
+  const daysLeft = Math.ceil((dueDate - today) / 86400000);
+  const priorityScore = { High: 45, Medium: 28, Low: 14 }[task.priority];
+  const dueScore = daysLeft < 0 ? 40 : Math.max(4, 32 - daysLeft * 4);
+  const effortScore = Math.min(18, Number(task.hours) * 3);
+
+  return Math.min(100, Math.round(priorityScore + dueScore + effortScore));
+}
+
+function getPendingTasksByScore() {
+  return tasks
+    .filter(task => !task.done)
+    .map(task => ({ ...task, score: calculateTaskScore(task) }))
+    .sort((first, second) => second.score - first.score);
+}
+
+function getSubjectAnalysis() {
+  return subjects.map(subject => {
+    const subjectTasks = tasks.filter(task => task.subject === subject);
+    const pending = subjectTasks.filter(task => !task.done);
+    const completed = subjectTasks.filter(task => task.done);
+    const pendingHours = pending.reduce((sum, task) => sum + Number(task.hours), 0);
+    const completedHours = completed.reduce((sum, task) => sum + Number(task.hours), 0);
+    const highPriority = pending.filter(task => task.priority === "High").length;
+    const weaknessScore = pendingHours * 12 + highPriority * 18 - completedHours * 4;
+
+    return { subject, pendingHours, completedHours, highPriority, weaknessScore };
+  }).sort((first, second) => second.weaknessScore - first.weaknessScore);
+}
+
+function renderCoach() {
+  const pending = getPendingTasksByScore();
+  const urgent = pending.filter(task => task.score >= 75).length;
+  const totalPendingHours = pending.reduce((sum, task) => sum + Number(task.hours), 0);
+
+  if (urgent >= 3 || totalPendingHours >= 10) {
+    riskLevel.textContent = "High";
+    riskReason.textContent = "Several urgent tasks or too many pending hours are building up.";
+  } else if (urgent >= 1 || totalPendingHours >= 5) {
+    riskLevel.textContent = "Medium";
+    riskReason.textContent = "You have some pressure. Finish the highest-score task first.";
+  } else {
+    riskLevel.textContent = "Low";
+    riskReason.textContent = "Your current workload is manageable if you stay consistent.";
+  }
+
+  if (pending.length > 0) {
+    const best = pending[0];
+    nextTask.textContent = best.title;
+    nextTaskReason.textContent = best.subject + " should come first because its AI score is " + best.score + ".";
+  } else {
+    nextTask.textContent = "No pending task";
+    nextTaskReason.textContent = "All tasks are completed. Add more goals to continue planning.";
+  }
+
+  const weakest = getSubjectAnalysis()[0];
+  if (weakest && weakest.weaknessScore > 0) {
+    weakSubject.textContent = weakest.subject;
+    weakReason.textContent = weakest.pendingHours + " pending hours and " + weakest.highPriority + " high priority task(s).";
+  } else {
+    weakSubject.textContent = "Balanced";
+    weakReason.textContent = "No subject currently needs special attention.";
+  }
+}
+
+function renderWeeklyPlan() {
+  const pending = getPendingTasksByScore();
+  const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  weeklyPlan.innerHTML = "";
+
+  dayNames.forEach((day, index) => {
+    const card = document.createElement("article");
+    card.className = "day-card";
+
+    const title = document.createElement("strong");
+    title.textContent = day;
+
+    const text = document.createElement("p");
+    const task = pending[index % Math.max(pending.length, 1)];
+    text.textContent = task
+      ? task.subject + ": " + task.title + " (" + Math.min(task.hours, 2) + "h)"
+      : "Revision, notes cleanup, or mock test practice.";
+
+    card.append(title, text);
+    weeklyPlan.append(card);
   });
 }
 
@@ -262,6 +365,10 @@ taskForm.addEventListener("submit", event => {
 filterInput.addEventListener("change", render);
 startTimer.addEventListener("click", toggleTimer);
 resetTimer.addEventListener("click", resetFocusTimer);
+generatePlan.addEventListener("click", () => {
+  renderCoach();
+  renderWeeklyPlan();
+});
 
 todayLabel.textContent = new Intl.DateTimeFormat("en", {
   weekday: "long",
